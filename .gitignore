@@ -1,0 +1,46 @@
+# Arquivos Jupyter
+.ipynb_checkpoints/
+
+# Arquivos temporários e de cache
+__pycache__/
+*.py[cod]
+*.so
+*.log
+*.tmp
+*.swp
+*.DS_Store
+
+# Ambiente virtual
+venv/
+env/
+ENV/
+.venv/
+
+# Configurações específicas de IDEs
+.vscode/
+.idea/
+
+# Arquivos de dados grandes (se for o caso, ajuste conforme necessário)
+*.csv
+*.tsv
+*.h5
+*.db
+*.sqlite
+*.parquet
+*.pkl
+*.joblib
+*.npy
+*.npz
+
+# Saídas de modelos ou imagens (opcional, caso não queira versionar)
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.jpg
+*.png
+*.gif
+
+# Arquivos ocultos do Jupyter
+.jupyter/
+
