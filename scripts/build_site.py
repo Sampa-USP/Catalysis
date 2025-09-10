@@ -21,8 +21,8 @@ INDEX_HTML_TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   :root {
-    --bg:#0f172a; --fg:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8;
-    --card:#111827; --link:#93c5fd;
+    --bg:#0f172a; --fg:#e2e8f0; --muted:#94a3b8; --accent:#60a5fa;
+    --card:#111827; --link:#bfdbfe;
   }
   * { box-sizing: border-box; }
   body { margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji'; background:var(--bg); color:var(--fg); }
