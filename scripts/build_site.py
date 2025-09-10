@@ -185,6 +185,9 @@ def collect_tree(src: Path, out: Path, execute: bool):
         rel = path.relative_to(src)
         file_node = {"type": "file", "name": rel.name, "path": str(rel)}
 
+        if ext != ".ipynb":
+            continue  # <-- ignora tudo que não seja notebook
+
         if ext == ".ipynb":
             nb_count += 1
             out_html = (out / rel).with_suffix(".html")
