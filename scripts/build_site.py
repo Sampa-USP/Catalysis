@@ -21,8 +21,8 @@ INDEX_HTML_TEMPLATE = """<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   :root {
-    --bg:#0f172a; --fg:#e2e8f0; --muted:#94a3b8; --accent:#60a5fa;
-    --card:#111827; --link:#bfdbfe;
+    --bg:#1e293b; --fg:#e2e8f0; --muted:#94a3b8; --accent:#60a5fa;
+    --card:#273549; --link:#bfdbfe;
   }
   * { box-sizing: border-box; }
   body { margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji'; background:var(--bg); color:var(--fg); }
@@ -250,7 +250,7 @@ def main():
     execute = args.execute.lower() == "true"
 
     tree, nb_count = collect_tree(src, out, execute)
-    write_index(out, tree, nb_count, title=f"Árvore de Notebooks — {src.name}")
+    write_index(out, tree, nb_count, title=f"Notebooks Tree — {src.name}")
 
 
 if __name__ == "__main__":
