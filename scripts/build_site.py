@@ -151,10 +151,12 @@ def collect_tree(src: Path, out: Path, execute: bool):
         if not parts:
             continue
 
-        # ignore .git e .github por padrão (ajuste se quiser listá-los)
-        if any(p.startswith(".git") for p in parts):
-            continue
-        if parts[0] in (".github",):
+        # Ignorar arquivos/pastas específicas
+        if (
+            any(p.startswith(".git") for p in parts)
+            or parts[0] in (".github", "scripts")
+            or path.name == "requirements.txt"
+        ):
             continue
 
         # garantir nós de diretório
