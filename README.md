@@ -44,5 +44,5 @@ Contributions in the form of **issues**, **enhancements**, or **pull requests** 
 ---
 
 ## License
-Distributed under the **MIT License**.
+Distributed under the **MIT License**n.
 
