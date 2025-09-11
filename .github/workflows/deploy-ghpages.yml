@@ -26,9 +26,10 @@ jobs:
 
       - name: Build static site
         run: |
-          python scripts/build_site.py \
+          python .scripts/build_site.py \
             --src . \
             --out site \
+            --template .scripts/template \
             --execute false
 
       - name: Deploy to gh-pages branch

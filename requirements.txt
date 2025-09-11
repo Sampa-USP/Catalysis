@@ -1,0 +1,4 @@
+jupyter
+nbconvert
+jupyterlab_pygments
+pygments

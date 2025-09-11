@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>{{TITLE}}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="./css/styles.css" />
+</head>
+
+<body>
+    <header class="header">
+        <h1>{{TITLE}}</h1>
+        <div class="meta">
+            Generated at {{TIMESTAMP}} • Total notebooks:
+            <span id="nbcount">{{NBCOUNT}}</span>
+        </div>
+    </header>
+
+    <main class="layout">
+        <nav class="sidebar">
+            <input id="q" class="search" placeholder="Filter..." />
+            <ul id="tree" class="tree"></ul>
+        </nav>
+        <section class="viewer">
+            <iframe id="viewer" src=""></iframe>
+        </section>
+    </main>
+
+    <!-- Aqui o build_site.py injeta a árvore -->
+    <script>
+        window.TREE_DATA = {{ TREE_JSON}};
+    </script>
+    <script src="./js/app.js"></script>
+</body>
+
+</html>
