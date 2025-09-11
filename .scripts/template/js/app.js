@@ -1,6 +1,6 @@
 (function () {
-    const data = window.TREE_DATA;                // ← define 'data'
-    if (!data) { console.error('TREE_DATA missing'); return; }
+    const data = window.TREE_DATA;
+    if (!data) return; // página Home não tem TREE_DATA
 
     const elTree = document.getElementById('tree');
     const q = document.getElementById('q');
@@ -16,7 +16,6 @@
             label.textContent = node.name;
             label.onclick = () => li.classList.toggle('open');
             li.appendChild(label);
-
             const ul = document.createElement('ul');
             ul.className = 'children';
             (node.children || []).forEach(ch => ul.appendChild(mkNode(ch)));
@@ -27,10 +26,7 @@
                 a.textContent = node.name;
                 a.href = '#';
                 a.className = 'file-notebook';
-                a.onclick = (e) => {
-                    e.preventDefault();
-                    viewer.src = node.nb_html;
-                };
+                a.onclick = (e) => { e.preventDefault(); viewer.src = node.nb_html; };
                 label.appendChild(a);
             } else {
                 label.textContent = node.name;
@@ -57,10 +53,7 @@
         }
 
         const filtered = cloneFiltered(data);
-        if (!filtered) {
-            elTree.innerHTML = '<li class="node">Nothing found…</li>';
-            return;
-        }
+        if (!filtered) { elTree.innerHTML = '<li class="node">Nothing found…</li>'; return; }
         (filtered.children || []).forEach(ch => elTree.appendChild(mkNode(ch)));
     }
 

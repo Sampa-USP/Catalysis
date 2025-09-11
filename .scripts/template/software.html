@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>{{TITLE}}</title>
+    <title>{{TITLE}} — Software</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="./css/paleta_cores.css" />
     <link rel="stylesheet" href="./css/styles.css" />
     <link rel="stylesheet" href="./css/software.css" />
     <link rel="stylesheet" href="./css/nav_bar.css" />
-    <link rel="stylesheet" href="./css/pages.css" />
 </head>
 
 <body>
@@ -24,23 +23,22 @@
         </div>
     </header>
 
-    <main class="main">
-        <h2>About</h2>
-        <div class="card grid-2">
-            <div>
-                <p><!-- sua bio aqui --></p>
-                <p class="muted">Generated at {{TIMESTAMP}} • Total notebooks: <span id="nbcount">{{NBCOUNT}}</span></p>
-                <p>
-                    <strong>Contact:</strong><br>
-                    email@domain.com · <a href="https://github.com/USER" target="_blank">GitHub</a> ·
-                    <a href="#" target="_blank">Scholar</a> · <a href="#" target="_blank">Website</a>
-                </p>
-            </div>
-            <div>
-                <img class="avatar" src="./css/avatar-placeholder.png" alt="Profile photo" />
-            </div>
+    <main class="main-wide">
+        <h2>Software</h2>
+        <div class="layout">
+            <aside class="sidebar">
+                <input id="q" class="search" placeholder="Filter notebooks..." />
+                <ul id="tree" class="tree"></ul>
+            </aside>
+            <section class="viewer">
+                <iframe id="viewer" src=""></iframe>
+            </section>
         </div>
     </main>
+
+    <!-- injeta a árvore apenas nesta página -->
+    <script>window.TREE_DATA = {{ TREE_JSON }};</script>
+    <script src="./js/app.js"></script>
 </body>
 
 </html>

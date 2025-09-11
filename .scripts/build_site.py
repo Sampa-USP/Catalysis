@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 from datetime import datetime
 import sys
+import re, json, html
 
 # ============================= Helpers =============================
 
@@ -234,22 +235,46 @@ def collect_tree(src: Path, out: Path, execute: bool):
 
 
 def build_static_site(src: Path, out: Path, template_dir: Path, title: str, execute: bool):
-    # 1) Varredura + conversão
     tree, nb_count = collect_tree(src, out, execute)
 
-    # 2) Carrega template e renderiza index.html
-    index_src = load_template_index(template_dir)
-    html_doc = render_index(index_src, title=title, nb_count=nb_count, tree=tree)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "index.html").write_text(html_doc, encoding="utf-8")
+    # páginas a gerar: nome do arquivo -> injeta TREE_JSON?
+    pages = [
+        ("index.html", False),     # Home
+        ("software.html", True),   # Software (com árvore)
+        ("publications.html", False),
+        ("research.html", False),
+    ]
+    for fname, needs_tree in pages:
+        page_path = template_dir / fname
+        if not page_path.exists():  # ignora se não existir
+            continue
+        src_html = page_path.read_text(encoding="utf-8")
+        html_doc = render_tokens(src_html, title, nb_count, tree if needs_tree else None)
+        (out / fname).write_text(html_doc, encoding="utf-8")
 
-    # 3) Copia assets do template (css/js/qualquer arquivo extra)
+    # assets
     copy_tree(template_dir / "css", out / "css")
     copy_tree(template_dir / "js", out / "js")
 
     return nb_count
 
 # ================================ CLI ================================
+
+def render_tokens(src: str, title: str, nb_count: int, tree: dict | None):
+    ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    rep = {
+        r"\{\{\s*TITLE\s*\}\}": html.escape(title),
+        r"\{\{\s*TIMESTAMP\s*\}\}": ts,
+        r"\{\{\s*NBCOUNT\s*\}\}": str(nb_count),
+    }
+    out = src
+    for pat, val in rep.items():
+        out = re.sub(pat, lambda m, v=val: v, out)
+    if tree is not None:
+        safe_json = json.dumps(tree, ensure_ascii=False).replace("</", "<\\/")
+        out = re.sub(r"\{\{\s*TREE_JSON\s*\}\}", lambda m, v=safe_json: v, out)
+    return out
 
 def main():
     ap = argparse.ArgumentParser(
