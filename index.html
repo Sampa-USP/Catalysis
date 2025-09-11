@@ -1,116 +1,37 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="en">
+
 <head>
-<meta charset="utf-8">
-<title>Notebooks Tree — Catalisis</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-  :root {
-    --bg:#1e293b; --fg:#e2e8f0; --muted:#94a3b8; --accent:#60a5fa;
-    --card:#273549; --link:#bfdbfe;
-  }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji'; background:var(--bg); color:var(--fg); }
-  header { padding:16px 20px; border-bottom:1px solid #1f2937; background:#0b1220; position:sticky; top:0; z-index:1; }
-  h1 { margin:0; font-size:1.1rem; letter-spacing:.5px; }
-  .meta { color:var(--muted); font-size:.85rem; margin-top:4px; }
-  main { display:grid; grid-template-columns: 320px 1fr; min-height: calc(100vh - 64px); }
-  nav { border-right:1px solid #1f2937; padding:16px; overflow:auto; }
-  section { padding:0; }
-  .search { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #334155; background:#0b1220; color:var(--fg); }
-  ul.tree { list-style:none; padding-left:0; }
-  .node { margin:2px 0; }
-  .dir > .label::before { content:"▸"; display:inline-block; width:1em; color:var(--muted); }
-  .dir.open > .label::before { content:"▾"; }
-  .label { cursor:pointer; padding:2px 4px; border-radius:6px; }
-  .label:hover { background:#111827; }
-  .children { margin-left:18px; display:none; }
-  .dir.open > .children { display:block; }
-  a { color:var(--link); text-decoration:none; }
-  a:hover { text-decoration:underline; }
-  .file-notebook::after { content:" .ipynb"; color:var(--muted); font-size:.8rem; margin-left:6px; }
-  footer { color:var(--muted); font-size:.85rem; border-top:1px solid #1f2937; padding:10px 16px; }
-  #viewer { width:100%; height: calc(100vh - 64px); border:none; display:block; background:#0b1220; }
-</style>
+    <meta charset="utf-8" />
+    <title>Notebooks Tree — Catalysis</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="./css/styles.css" />
 </head>
+
 <body>
-<header>
-  <h1>Notebooks Tree — Catalisis</h1>
-  <div class="meta">Gerado em 2025-09-10 20:43 UTC • Branch: main • Total de notebooks: <span id="nbcount">5</span></div>
-</header>
-<main>
-  <nav>
-    <input id="q" class="search" placeholder="Filtrar (nome do arquivo ou pasta)…" />
-    <ul id="tree" class="tree"></ul>
-  </nav>
-  <section>
-    <iframe id="viewer" src=""></iframe>
-  </section>
-</main>
-<footer>
-  Site estático gerado por <code>build_site.py</code> (nbconvert).
-</footer>
-<script>
-const data = {"type": "dir", "name": "Catalisis", "path": "", "children": [{"type": "dir", "name": "Teste-Conectividade", "path": "Teste-Conectividade", "children": [{"type": "dir", "name": "config", "path": "Teste-Conectividade/config", "children": [{"type": "file", "name": "load_configuration.ipynb", "path": "Teste-Conectividade/config/load_configuration.ipynb", "nb_html": "Teste-Conectividade/config/load_configuration.html"}]}, {"type": "dir", "name": "devices", "path": "Teste-Conectividade/devices", "children": [{"type": "file", "name": "aws_backends.ipynb", "path": "Teste-Conectividade/devices/aws_backends.ipynb", "nb_html": "Teste-Conectividade/devices/aws_backends.html"}]}, {"type": "dir", "name": "execution", "path": "Teste-Conectividade/execution", "children": [{"type": "file", "name": "Execution.ipynb", "path": "Teste-Conectividade/execution/Execution.ipynb", "nb_html": "Teste-Conectividade/execution/Execution.html"}]}, {"type": "dir", "name": "pricing", "path": "Teste-Conectividade/pricing", "children": [{"type": "file", "name": "Pricing.ipynb", "path": "Teste-Conectividade/pricing/Pricing.ipynb", "nb_html": "Teste-Conectividade/pricing/Pricing.html"}]}, {"type": "file", "name": "quantum-task.ipynb", "path": "Teste-Conectividade/quantum-task.ipynb", "nb_html": "Teste-Conectividade/quantum-task.html"}]}]};  // JSON com a árvore
-const elTree = document.getElementById('tree');
-const q = document.getElementById('q');
+    <header class="header">
+        <h1>Notebooks Tree — Catalysis</h1>
+        <div class="meta">
+            Generated at 2025-09-11 22:25 UTC • Total notebooks:
+            <span id="nbcount">5</span>
+        </div>
+    </header>
 
-function mkNode(node) {
-  const li = document.createElement('li');
-  li.className = 'node ' + (node.type === 'dir' ? 'dir' : 'file');
-  const label = document.createElement('span');
-  label.className = 'label';
+    <main class="layout">
+        <nav class="sidebar">
+            <input id="q" class="search" placeholder="Filter..." />
+            <ul id="tree" class="tree"></ul>
+        </nav>
+        <section class="viewer">
+            <iframe id="viewer" src=""></iframe>
+        </section>
+    </main>
 
-  if (node.type === 'dir') {
-    label.textContent = node.name;
-    label.onclick = () => li.classList.toggle('open');
-    li.appendChild(label);
-    const ul = document.createElement('ul');
-    ul.className = 'children';
-    node.children.forEach(ch => ul.appendChild(mkNode(ch)));
-    li.appendChild(ul);
-  } else {
-    if (node.nb_html) {
-      const a = document.createElement('a');
-      a.textContent = node.name;
-      a.href = "#";
-      a.className = 'file-notebook';
-      a.onclick = (e) => {
-        e.preventDefault();
-        document.getElementById('viewer').src = node.nb_html;
-      };
-      label.appendChild(a);
-    } else {
-      label.textContent = node.name;
-    }
-    li.appendChild(label);
-  }
-  return li;
-}
-
-function render(filter='') {
-  elTree.innerHTML = '';
-  const norm = s => s.toLowerCase();
-  function pass(node) {
-    if (!filter) return true;
-    return norm(node.name).includes(filter) || (node.path && norm(node.path).includes(filter));
-  }
-  function cloneFiltered(node) {
-    if (node.type === 'file') return pass(node) ? node : null;
-    const kids = node.children.map(cloneFiltered).filter(Boolean);
-    if (kids.length) return {...node, children:kids};
-    return pass(node) ? {...node, children:[]} : null;
-  }
-  const filtered = cloneFiltered(data);
-  if (!filtered) {
-    elTree.innerHTML = '<li class="node">Nada encontrado…</li>';
-    return;
-  }
-  filtered.children.forEach(ch => elTree.appendChild(mkNode(ch)));
-}
-
-q.addEventListener('input', (e) => render(e.target.value.trim().toLowerCase()));
-render();
-</script>
+    <!-- Aqui o build_site.py injeta a árvore -->
+    <script>
+        window.TREE_DATA = {"type": "dir", "name": "Catalysis", "path": "", "children": [{"type": "dir", "name": "Teste-Conectividade", "path": "Teste-Conectividade", "children": [{"type": "dir", "name": "config", "path": "Teste-Conectividade/config", "children": [{"type": "file", "name": "load_configuration.ipynb", "path": "Teste-Conectividade/config/load_configuration.ipynb", "nb_html": "Teste-Conectividade/config/load_configuration.html"}]}, {"type": "dir", "name": "devices", "path": "Teste-Conectividade/devices", "children": [{"type": "file", "name": "aws_backends.ipynb", "path": "Teste-Conectividade/devices/aws_backends.ipynb", "nb_html": "Teste-Conectividade/devices/aws_backends.html"}]}, {"type": "dir", "name": "execution", "path": "Teste-Conectividade/execution", "children": [{"type": "file", "name": "Execution.ipynb", "path": "Teste-Conectividade/execution/Execution.ipynb", "nb_html": "Teste-Conectividade/execution/Execution.html"}]}, {"type": "dir", "name": "pricing", "path": "Teste-Conectividade/pricing", "children": [{"type": "file", "name": "Pricing.ipynb", "path": "Teste-Conectividade/pricing/Pricing.ipynb", "nb_html": "Teste-Conectividade/pricing/Pricing.html"}]}, {"type": "file", "name": "quantum-task.ipynb", "path": "Teste-Conectividade/quantum-task.ipynb", "nb_html": "Teste-Conectividade/quantum-task.html"}]}]};
+    </script>
+    <script src="./js/app.js"></script>
 </body>
+
 </html>
