@@ -2,3 +2,12 @@ jupyter
 nbconvert
 jupyterlab_pygments
 pygments
+amazon-braket-sdk
+amazon-braket-default-simulator
+boto3
+botocore
+
+numpy>=1.22
+pandas>=1.4
+matplotlib>=3.5
+scikit-learn>=1.0
