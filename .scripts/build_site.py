@@ -38,25 +38,6 @@ def load_template_index(template_dir: Path) -> str:
         raise FileNotFoundError(f"Template missing: {index_path}")
     return index_path.read_text(encoding="utf-8")
 
-# def render_index(index_src: str, title: str, nb_count: int, tree: dict) -> str:
-#     """
-#     Substituição simples por tokens (sem .format para evitar conflito com chaves do JS/CSS).
-#     Tokens suportados: {{TITLE}}, {{TIMESTAMP}}, {{NBCOUNT}}, {{TREE_JSON}}
-#     """
-#     timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-#     return (
-#         index_src
-#         .replace("{{TITLE}}", html.escape(title))
-#         .replace("{{TIMESTAMP}}", timestamp)
-#         .replace("{{NBCOUNT}}", str(nb_count))
-#         .replace("{{TREE_JSON}}", json.dumps(tree, ensure_ascii=False))
-#     )
-
-import re
-
-import re, json, html
-from datetime import datetime
-
 def render_index(index_src: str, title: str, nb_count: int, tree: dict) -> str:
     timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
     safe_json = json.dumps(tree, ensure_ascii=False).replace("</", "<\\/")  # evita fechar <script>
@@ -73,83 +54,6 @@ def render_index(index_src: str, title: str, nb_count: int, tree: dict) -> str:
     return out
 
 # ====================== Núcleo de varredura/build ======================
-
-# def collect_tree(src: Path, out: Path, execute: bool):
-#     """
-#     Varre src; converte SOMENTE arquivos .ipynb para .html em out mantendo a árvore.
-#     Retorna (tree_dict, nb_count).
-#     """
-#     nb_count = 0
-#     root = {"type": "dir", "name": src.name, "path": "", "children": []}
-#     dir_map = {str(src.resolve()): root}
-
-#     for path in sorted(src.rglob("*")):
-#         # pula a pasta de saída e seus filhos
-#         if out in path.parents or path == out:
-#             continue
-
-#         # ignora .git* e .github
-#         parts = path.relative_to(src).parts
-#         if not parts:
-#             continue
-#         if any(p.startswith(".git") for p in parts):
-#             continue
-#         if parts[0] in (".github",):
-#             continue
-
-#         # garantir nós de diretório
-#         cur_src_dir = src
-#         cur_node = root
-#         for i, p in enumerate(parts[:-1]):
-#             cur_src_dir = cur_src_dir / p
-#             key = str(cur_src_dir.resolve())
-#             if key not in dir_map:
-#                 node = {
-#                     "type": "dir",
-#                     "name": p,
-#                     "path": str(Path(*parts[: i + 1])),
-#                     "children": [],
-#                 }
-#                 cur_node["children"].append(node)
-#                 dir_map[key] = node
-#             cur_node = dir_map[key]
-
-#         if path.is_dir():
-#             # diretórios já mapeados
-#             continue
-
-#         # Somente notebooks
-#         if path.suffix.lower() != ".ipynb":
-#             continue
-
-#         rel = path.relative_to(src)
-#         file_node = {"type": "file", "name": rel.name, "path": str(rel)}
-
-#         # Converter notebook -> HTML
-#         nb_count += 1
-#         out_html = (out / rel).with_suffix(".html")
-#         out_html.parent.mkdir(parents=True, exist_ok=True)
-
-#         cmd = [
-#             "jupyter", "nbconvert",
-#             "--to", "html",
-#             "--output", out_html.name,
-#             "--output-dir", str(out_html.parent),
-#             str(path)
-#         ]
-#         if execute:
-#             # executa as células antes de converter (cuidado: torna o build mais lento)
-#             cmd.append("--execute")
-
-#         subprocess.run(cmd, check=True)
-
-#         # link relativo (usado pelo seu index para abrir no iframe)
-#         file_node["nb_html"] = str(out_html.relative_to(out)).replace(os.sep, "/")
-
-#         # anexa ao nó pai
-#         parent_key = str(path.parent.resolve())
-#         parent_node = dir_map.get(parent_key, root)
-#         parent_node["children"].append(file_node)
 
 #     return root, nb_count
 import sys, subprocess
