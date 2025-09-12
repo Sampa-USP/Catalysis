@@ -1,4 +1,3 @@
-
 * {
     box-sizing: border-box
 }
@@ -35,36 +34,20 @@ body {
 }
 
 
-/* Software (árvore + viewer) */
-.layout {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 16px;
-    width: 80%;
-    /* ocupa 80% da largura */
-    margin: 0 auto;
-    /* centraliza */
-    height: calc(100vh - 64px);
-    /* 100% da altura, descontando o header */
-}
-
-
-
-
 /* Estilo base para páginas com <main> (Home, Publications, Research, etc.) */
 main.page-container {
-  max-width: 960px;      /* largura consistente */
-  margin: 40px auto;     /* centralizado */
-  padding: 20px;
-  background: #1e293b;   /* fundo neutro */
-  border-radius: 8px;
-  color: var(--fg, #e2e8f0);
+    max-width: 960px;
+    /* largura consistente */
+    margin: 40px auto;
+    /* centralizado */
+    padding: 20px;
+    background: #1e293b;
+    /* fundo neutro */
+    border-radius: 8px;
+    color: var(--fg, #e2e8f0);
 }
 
 main.page-container h2 {
-  margin-top: 0;
- color: #fff;
+    margin-top: 0;
+    color: #fff;
 }
-
-
-
