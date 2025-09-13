@@ -7,10 +7,10 @@ amazon-braket-default-simulator
 boto3
 botocore
 
-numpy>=1.22
-pandas>=1.4
-matplotlib>=3.5
-scikit-learn>=1.0
+numpy
+pandas
+matplotlib
+scikit-learn
 seaborn
 pymatgen
 matminer
@@ -20,4 +20,6 @@ matplotlib
 seaborn
 scikit-learn
 pennylane
+pylatexenc
+qiskit
 
