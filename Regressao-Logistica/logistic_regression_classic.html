@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>simulacao</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>logistic_regression_classic</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7510,309 +7510,91 @@ a.anchor-link {
 </style>
 <!-- End of mermaid configuration --></head>
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<main><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1a122d17">
+<main><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=12f4c3f1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">math</span><span class="o">,</span><span class="w"> </span><span class="nn">itertools</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span><span class="o">,</span><span class="w"> </span><span class="nn">random</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># =========================================</span>
+<span class="c1"># Regressão Logística Clássica (4 features)</span>
+<span class="c1"># =========================================</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeaveOneOut</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">confusion_matrix</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVC</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeaveOneOut</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
 
-<span class="c1"># AWS Braket SDK</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsDevice</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.circuits</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.devices</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalSimulator</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0bbf7f0c">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Carregar dataset reduzido já com labels</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="c1"># 1) Carregar dataset</span>
+<span class="c1"># -----------------------------------------</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"metal_features_reduzido_com_y.csv"</span><span class="p">)</span>
 
+<span class="c1"># Features selecionadas</span>
 <span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Mendeleev"</span><span class="p">,</span> <span class="s2">"Tmelt_K"</span><span class="p">,</span> <span class="s2">"rcov_A"</span><span class="p">,</span> <span class="s2">"d_band_center"</span><span class="p">]</span>
-<span class="n">X_raw</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">features</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>   <span class="c1"># &lt;- esta é a matriz bruta (antes de normalizar)</span>
-<span class="n">y</span>     <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">features</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 <span class="n">metals</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"metal"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"X_raw shape:"</span><span class="p">,</span> <span class="n">X_raw</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"y shape:"</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>X_raw shape: (9, 4)
-y shape: (9,)
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a374370f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># %pip install amazon-braket-sdk amazon-braket-default-simulator -q</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="c1"># 2) Normalização (0,1)</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span>
+<span class="n">Xn</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsDevice</span><span class="p">,</span> <span class="n">AwsSession</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.circuits</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.devices</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalSimulator</span>
-
-<span class="c1"># Sessão na região (ajuste se usar outra)</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">AwsSession</span><span class="p">()</span>  <span class="c1"># ou us-west-1, eu-west-2 etc.</span>
-
-<span class="c1"># SV1 (state-vector simulator gerenciado)</span>
-<span class="n">sv1</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="s2">"arn:aws:braket:::device/quantum-simulator/amazon/sv1"</span><span class="p">,</span> <span class="n">aws_session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>
-
-<span class="c1"># Outros simuladores gerenciados:</span>
-<span class="n">dm1</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="s2">"arn:aws:braket:::device/quantum-simulator/amazon/dm1"</span><span class="p">,</span> <span class="n">aws_session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>  <span class="c1"># density matrix</span>
-<span class="n">tn1</span> <span class="o">=</span> <span class="n">AwsDevice</span><span class="p">(</span><span class="s2">"arn:aws:braket:::device/quantum-simulator/amazon/tn1"</span><span class="p">,</span> <span class="n">aws_session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span>  <span class="c1"># tensor network</span>
-
-<span class="c1"># Ex.: listar QPUs disponíveis na região da sessão (para pegar o ARN certo)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.aws</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwsDeviceType</span><span class="p">,</span> <span class="n">AwsQuantumTaskBatch</span>
-<span class="n">qpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">AwsDevice</span><span class="o">.</span><span class="n">get_devices</span><span class="p">(</span><span class="n">aws_session</span><span class="o">=</span><span class="n">session</span><span class="p">)</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">AwsDeviceType</span><span class="o">.</span><span class="n">QPU</span><span class="p">]</span>
-<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">qpus</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"-&gt;"</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">arn</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Ankaa-3 -&gt; arn:aws:braket:us-west-1::device/qpu/rigetti/Ankaa-3
-Aquila -&gt; arn:aws:braket:us-east-1::device/qpu/quera/Aquila
-Aria 1 -&gt; arn:aws:braket:us-east-1::device/qpu/ionq/Aria-1
-Aria 2 -&gt; arn:aws:braket:us-east-1::device/qpu/ionq/Aria-2
-Emerald -&gt; arn:aws:braket:eu-north-1::device/qpu/iqm/Emerald
-Forte 1 -&gt; arn:aws:braket:us-east-1::device/qpu/ionq/Forte-1
-Forte Enterprise 1 -&gt; arn:aws:braket:us-east-1::device/qpu/ionq/Forte-Enterprise-1
-Garnet -&gt; arn:aws:braket:eu-north-1::device/qpu/iqm/Garnet
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c4e467c5">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">braket.circuits</span><span class="w"> </span><span class="kn">import</span> <span class="n">Circuit</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">feature_map_ry_cz</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="c1"># x: 4 features em [0,1]</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">Circuit</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">layers</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">xi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">c</span><span class="o">.</span><span class="n">ry</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">xi</span><span class="p">)</span>
-        <span class="n">c</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">c</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">overlap_circuit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="n">Ux</span>  <span class="o">=</span> <span class="n">feature_map_ry_cz</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>  <span class="n">layers</span><span class="p">)</span>
-    <span class="n">Uxp</span> <span class="o">=</span> <span class="n">feature_map_ry_cz</span><span class="p">(</span><span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Circuit</span><span class="p">()</span><span class="o">.</span><span class="n">add_circuit</span><span class="p">(</span><span class="n">Ux</span><span class="o">.</span><span class="n">adjoint</span><span class="p">())</span><span class="o">.</span><span class="n">add_circuit</span><span class="p">(</span><span class="n">Uxp</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9945f4bc">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">x_demo</span>  <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">]</span>
-<span class="n">xp_demo</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"=== U(x) ==="</span><span class="p">);</span> <span class="nb">print</span><span class="p">(</span><span class="n">feature_map_ry_cz</span><span class="p">(</span><span class="n">x_demo</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">=== U(x)^† U(x') ==="</span><span class="p">);</span> <span class="nb">print</span><span class="p">(</span><span class="n">overlap_circuit</span><span class="p">(</span><span class="n">x_demo</span><span class="p">,</span> <span class="n">xp_demo</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>=== U(x) ===
-T  : │     0      │  1  │     2      │     3      │     4      │  5  │  6  │
-      ┌──────────┐       ┌──────────┐                                       
-q0 : ─┤ Ry(0.31) ├───●───┤ Ry(0.31) ├───────────────────●───────────────────
-      └──────────┘   │   └──────────┘                   │                   
-      ┌──────────┐ ┌─┴─┐              ┌──────────┐    ┌─┴─┐                 
-q1 : ─┤ Ry(0.63) ├─┤ Z ├──────●───────┤ Ry(0.63) ├────┤ Z ├───────●─────────
-      └──────────┘ └───┘      │       └──────────┘    └───┘       │         
-      ┌──────────┐          ┌─┴─┐                  ┌──────────┐ ┌─┴─┐       
-q2 : ─┤ Ry(0.94) ├──────────┤ Z ├──────────●───────┤ Ry(0.94) ├─┤ Z ├───●───
-      └──────────┘          └───┘          │       └──────────┘ └───┘   │   
-      ┌──────────┐                       ┌─┴─┐     ┌──────────┐       ┌─┴─┐ 
-q3 : ─┤ Ry(1.26) ├───────────────────────┤ Z ├─────┤ Ry(1.26) ├───────┤ Z ├─
-      └──────────┘                       └───┘     └──────────┘       └───┘ 
-T  : │     0      │  1  │     2      │     3      │     4      │  5  │  6  │
-
-=== U(x)^† U(x') ===
-T  : │  0  │      1      │      2      │      3      │      4      │      5      │      6      │     7      │  8  │     9      │     10     │     11     │ 12  │ 13  │
-                                        ┌───────────┐                             ┌───────────┐ ┌──────────┐       ┌──────────┐                                       
-q0 : ───────────────────────────●───────┤ Ry(-0.31) ├─────────────────────●───────┤ Ry(-0.31) ├─┤ Ry(0.63) ├───●───┤ Ry(0.63) ├───────────────────●───────────────────
-                                │       └───────────┘                     │       └───────────┘ └──────────┘   │   └──────────┘                   │                   
-                              ┌─┴─┐     ┌───────────┐                   ┌─┴─┐     ┌───────────┐ ┌──────────┐ ┌─┴─┐              ┌──────────┐    ┌─┴─┐                 
-q1 : ─────────────●───────────┤ Z ├─────┤ Ry(-0.63) ├───────●───────────┤ Z ├─────┤ Ry(-0.63) ├─┤ Ry(0.31) ├─┤ Z ├──────●───────┤ Ry(0.31) ├────┤ Z ├───────●─────────
-                  │           └───┘     └───────────┘       │           └───┘     └───────────┘ └──────────┘ └───┘      │       └──────────┘    └───┘       │         
-                ┌─┴─┐     ┌───────────┐                   ┌─┴─┐     ┌───────────┐ ┌──────────┐                        ┌─┴─┐                  ┌──────────┐ ┌─┴─┐       
-q2 : ───●───────┤ Z ├─────┤ Ry(-0.94) ├───────●───────────┤ Z ├─────┤ Ry(-0.94) ├─┤ Ry(1.26) ├────────────────────────┤ Z ├──────────●───────┤ Ry(1.26) ├─┤ Z ├───●───
-        │       └───┘     └───────────┘       │           └───┘     └───────────┘ └──────────┘                        └───┘          │       └──────────┘ └───┘   │   
-      ┌─┴─┐ ┌───────────┐                   ┌─┴─┐     ┌───────────┐ ┌──────────┐                                                   ┌─┴─┐     ┌──────────┐       ┌─┴─┐ 
-q3 : ─┤ Z ├─┤ Ry(-1.26) ├───────────────────┤ Z ├─────┤ Ry(-1.26) ├─┤ Ry(0.94) ├───────────────────────────────────────────────────┤ Z ├─────┤ Ry(0.94) ├───────┤ Z ├─
-      └───┘ └───────────┘                   └───┘     └───────────┘ └──────────┘                                                   └───┘     └──────────┘       └───┘ 
-T  : │  0  │      1      │      2      │      3      │      4      │      5      │      6      │     7      │  8  │     9      │     10     │     11     │ 12  │ 13  │
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7eb8aa9f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">fidelity_any</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">2000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Estima |&lt;Phi(x)|Phi(x')&gt;|^2 como frequência de '0000'.</span>
-<span class="sd">    Funciona em SV1/DM1/TN1 e em QPUs.</span>
-<span class="sd">    """</span>
-    <span class="n">circ</span> <span class="o">=</span> <span class="n">overlap_circuit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
-    <span class="n">circ</span> <span class="o">=</span> <span class="n">circ</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>            <span class="c1"># mede todos os qubits</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">shots</span><span class="p">)</span>
-    <span class="n">counts</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">measurement_counts</span>  <span class="c1"># dict: 'bitstring' -&gt; contagem</span>
-    <span class="k">return</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'0000'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">shots</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1211b4ea">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">fidelity_qpu</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">2000</span><span class="p">):</span>
-    <span class="n">circ</span> <span class="o">=</span> <span class="n">overlap_circuit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="p">)</span>
-    <span class="n">circ</span> <span class="o">=</span> <span class="n">circ</span><span class="o">.</span><span class="n">measure_all</span><span class="p">()</span>  <span class="c1"># mede todos os qubits</span>
-    <span class="n">task</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">circ</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="n">shots</span><span class="p">)</span>
-    <span class="n">counts</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span><span class="o">.</span><span class="n">measurement_counts</span>  <span class="c1"># dict: bitstring -&gt; contagem</span>
-    <span class="c1"># bitstring de 4 qubits no Braket é '0000' para |0...0&gt; (little-endian por default)</span>
-    <span class="n">p0000</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'0000'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">shots</span>
-    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">p0000</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=ec7bcc4d">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVC</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">LeaveOneOut</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span>
-
-<span class="c1"># escolha do device:</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">sv1</span>          <span class="c1"># simulador gerenciado (exato, rápido)</span>
-<span class="c1"># device = dm1        # também ok com shots=0</span>
-<span class="c1"># device = tn1        # usar versão "qpu" (shots &gt; 0)</span>
-<span class="c1"># device = AwsDevice("arn:.../qpu/ionq/Aria-2", aws_session=session)  # exemplo: QPU -&gt; usar versão "qpu"</span>
-
-<span class="c1"># Se for SV1/DM1 -&gt; use fidelity_simulator; se for TN1/QPU -&gt; fidelity_qpu</span>
-<span class="n">use_qpu_mode</span> <span class="o">=</span> <span class="p">(</span><span class="n">device</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"deviceType"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"QPU"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">"tn1"</span> <span class="ow">in</span> <span class="n">device</span><span class="o">.</span><span class="n">arn</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">fidelity_dispatch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">use_qpu_mode</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fidelity_qpu</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fidelity_simulator</span><span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">)</span>
-
-<span class="c1"># … dentro do LOO:</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="c1"># 3) Leave-One-Out Cross Validation</span>
+<span class="c1"># -----------------------------------------</span>
 <span class="n">loo</span> <span class="o">=</span> <span class="n">LeaveOneOut</span><span class="p">()</span>
-<span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">tr</span><span class="p">,</span> <span class="n">te</span> <span class="ow">in</span> <span class="n">loo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">X_raw</span><span class="p">):</span>
-    <span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_raw</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
-    <span class="n">Xtr</span><span class="p">,</span> <span class="n">Xte</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_raw</span><span class="p">[</span><span class="n">tr</span><span class="p">]),</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_raw</span><span class="p">[</span><span class="n">te</span><span class="p">])</span>
+<span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">y_prob</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
 
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Xtr</span><span class="p">)</span>
-    <span class="n">Ktr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-            <span class="n">Ktr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">fidelity_dispatch</span><span class="p">(</span><span class="n">Xtr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Xtr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">train_idx</span><span class="p">,</span> <span class="n">test_idx</span> <span class="ow">in</span> <span class="n">loo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">Xn</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">"liblinear"</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xn</span><span class="p">[</span><span class="n">train_idx</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">train_idx</span><span class="p">])</span>
+    
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xn</span><span class="p">[</span><span class="n">test_idx</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xn</span><span class="p">[</span><span class="n">test_idx</span><span class="p">])[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    
+    <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span>
+    <span class="n">y_prob</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+    <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">test_idx</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="n">Kte</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-        <span class="n">Kte</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">fidelity_dispatch</span><span class="p">(</span><span class="n">Xte</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Xtr</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">layers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="c1"># 4) Avaliação</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="n">cm</span>  <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 
-    <span class="n">clf</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s2">"precomputed"</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Ktr</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
-    <span class="n">y_pred</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Kte</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">y_true</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">te</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Logistic Regression (4 features) — LOO accuracy = </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Confusion Matrix [rows=true 0,1 ; cols=pred 0,1]:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">cm</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Classification Report:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"QSVM (device ="</span><span class="p">,</span> <span class="n">device</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">") LOO acc ="</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+<span class="c1"># Tabela de resultados</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">"metal"</span><span class="p">:</span> <span class="n">metals</span><span class="p">,</span>
+    <span class="s2">"y_true"</span><span class="p">:</span> <span class="n">y_true</span><span class="p">,</span>
+    <span class="s2">"logreg_pred"</span><span class="p">:</span> <span class="n">y_pred</span><span class="p">,</span>
+    <span class="s2">"logreg_proba_1"</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">y_prob</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">"ok"</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_pred</span><span class="p">))</span>
+<span class="p">})</span>
+<span class="n">display</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+<span class="c1"># -----------------------------------------</span>
+<span class="c1"># 5) Gráfico da Matriz de Confusão</span>
+<span class="c1"># -----------------------------------------</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">"d"</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">"Blues"</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">yticklabels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Predicted"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"True"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Confusion Matrix - Logistic Regression"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -7824,137 +7606,136 @@ T  : │  0  │      1      │      2      │      3      │      4      │
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ValidationException</span>                       Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[16]</span><span class="ansi-green-fg">, line 32</span>
-<span class="ansi-green-fg">     30</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> i <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span style="color: rgb(0,135,0)">range</span>(n):
-<span class="ansi-green-fg">     31</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> j <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span style="color: rgb(0,135,0)">range</span>(n):
-<span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">32</span>         Ktr[i,j] = <span class="ansi-yellow-bg">fidelity_dispatch</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">Xtr</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg">i</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">Xtr</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg">j</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">layers</span><span class="ansi-yellow-bg">=</span><span class="ansi-green-fg ansi-yellow-bg">2</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">     34</span> Kte = np.zeros((<span class="ansi-green-fg">1</span>,n))
-<span class="ansi-green-fg">     35</span> <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> j <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> <span style="color: rgb(0,135,0)">range</span>(n):
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Logistic Regression (4 features) — LOO accuracy = 0.667
 
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[16]</span><span class="ansi-green-fg">, line 19</span>, in <span class="ansi-cyan-fg">fidelity_dispatch</span><span class="ansi-blue-fg">(x, xp, layers)</span>
-<span class="ansi-green-fg">     17</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> fidelity_qpu(device, x, xp, layers=layers, shots=<span class="ansi-green-fg">2000</span>)
-<span class="ansi-green-fg">     18</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
-<span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">19</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">fidelity_simulator</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">device</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">x</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">xp</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">layers</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">layers</span><span class="ansi-yellow-bg">)</span>
+Confusion Matrix [rows=true 0,1 ; cols=pred 0,1]:
+ [[1 3]
+ [0 5]]
 
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[14]</span><span class="ansi-green-fg">, line 3</span>, in <span class="ansi-cyan-fg">fidelity_simulator</span><span class="ansi-blue-fg">(device, x, xp, layers)</span>
-<span class="ansi-green-fg">      1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span class="ansi-blue-fg">fidelity_simulator</span>(device, x, xp, layers=<span class="ansi-green-fg">2</span>):
-<span class="ansi-green-fg">      2</span>     circ = overlap_circuit(x, xp, layers).probability([<span class="ansi-green-fg">0</span>,<span class="ansi-green-fg">1</span>,<span class="ansi-green-fg">2</span>,<span class="ansi-green-fg">3</span>])
-<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">3</span>     task = <span class="ansi-yellow-bg">device</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">run</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">circ</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">shots</span><span class="ansi-yellow-bg">=</span><span class="ansi-green-fg ansi-yellow-bg">0</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">      4</span>     probs = task.result().result_types[<span class="ansi-green-fg">0</span>].value
-<span class="ansi-green-fg">      5</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span style="color: rgb(0,135,0)">float</span>(probs[<span class="ansi-green-fg">0</span>])
+Classification Report:
+               precision    recall  f1-score   support
 
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/braket/aws/aws_device.py:205</span>, in <span class="ansi-cyan-fg">AwsDevice.run</span><span class="ansi-blue-fg">(self, task_specification, s3_destination_folder, shots, poll_timeout_seconds, poll_interval_seconds, inputs, gate_definitions, reservation_arn, *aws_quantum_task_args, **aws_quantum_task_kwargs)</span>
-<span class="ansi-green-fg">    203</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">self</span>._noise_model:
-<span class="ansi-green-fg">    204</span>     task_specification = <span style="color: rgb(0,135,0)">self</span>._apply_noise_model_to_circuit(task_specification)
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">205</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">AwsQuantumTask</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">create</span><span class="ansi-yellow-bg">(</span>
-<span class="ansi-green-fg">    206</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_aws_session</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    207</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_arn</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    208</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">task_specification</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    209</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">s3_destination_folder</span>
-<span class="ansi-green-fg">    210</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">(</span>
-<span class="ansi-green-fg">    211</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">AwsSession</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">parse_s3_uri</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">os</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">environ</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">get</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-fg ansi-yellow-bg">AMZN_BRAKET_TASK_RESULTS_S3_URI</span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    212</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">if</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-fg ansi-yellow-bg">AMZN_BRAKET_TASK_RESULTS_S3_URI</span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">in</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">os</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">environ</span>
-<span class="ansi-green-fg">    213</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">else</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">None</span>
-<span class="ansi-green-fg">    214</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    215</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_aws_session</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">default_bucket</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-fg ansi-yellow-bg">tasks</span><span class="ansi-yellow-fg ansi-yellow-bg">"</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    216</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">shots</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">if</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">shots</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">is</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">not</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">None</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(0,135,0)">else</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_default_shots</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">task_specification</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    217</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">poll_timeout_seconds</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">poll_timeout_seconds</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    218</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">poll_interval_seconds</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">poll_interval_seconds</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_poll_interval_seconds</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    219</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">inputs</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">inputs</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    220</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">gate_definitions</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">gate_definitions</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    221</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">reservation_arn</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">reservation_arn</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    222</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">aws_quantum_task_args</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    223</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">aws_quantum_task_kwargs</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    224</span> <span class="ansi-yellow-bg">)</span>
+           0       1.00      0.25      0.40         4
+           1       0.62      1.00      0.77         5
 
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/braket/aws/aws_quantum_task.py:209</span>, in <span class="ansi-cyan-fg">AwsQuantumTask.create</span><span class="ansi-blue-fg">(aws_session, device_arn, task_specification, s3_destination_folder, shots, device_parameters, disable_qubit_rewiring, tags, inputs, gate_definitions, quiet, reservation_arn, *args, **kwargs)</span>
-<span class="ansi-green-fg">    204</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> unbounded_parameters := param_names - <span style="color: rgb(0,135,0)">set</span>(inputs.keys()):
-<span class="ansi-green-fg">    205</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ValueError</span>(
-<span class="ansi-green-fg">    206</span>             <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Cannot execute circuit with unbound parameters: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>unbounded_parameters<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">"</span>
-<span class="ansi-green-fg">    207</span>         )
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">209</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">_create_internal</span><span class="ansi-yellow-bg">(</span>
-<span class="ansi-green-fg">    210</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">task_specification</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    211</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">aws_session</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    212</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">create_task_kwargs</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    213</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">device_arn</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    214</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">device_parameters</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">{</span><span class="ansi-yellow-bg">}</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    215</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">disable_qubit_rewiring</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    216</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">inputs</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    217</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">gate_definitions</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    218</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">quiet</span><span class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">quiet</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    219</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    220</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">,</span>
-<span class="ansi-green-fg">    221</span> <span class="ansi-yellow-bg">)</span>
+    accuracy                           0.67         9
+   macro avg       0.81      0.62      0.58         9
+weighted avg       0.79      0.67      0.61         9
 
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">/usr/lib/python3.12/functools.py:909</span>, in <span class="ansi-cyan-fg">singledispatch.&lt;locals&gt;.wrapper</span><span class="ansi-blue-fg">(*args, **kw)</span>
-<span class="ansi-green-fg">    905</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> args:
-<span class="ansi-green-fg">    906</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">TypeError</span>(<span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">'</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>funcname<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg"> requires at least </span><span class="ansi-yellow-fg">'</span>
-<span class="ansi-green-fg">    907</span>                     <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">1 positional argument</span><span class="ansi-yellow-fg">'</span>)
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">909</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">dispatch</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">[</span><span class="ansi-green-fg ansi-yellow-bg">0</span><span class="ansi-yellow-bg">]</span><span class="ansi-yellow-bg">.</span><span class="ansi-blue-fg ansi-yellow-bg">__class__</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">kw</span><span class="ansi-yellow-bg">)</span>
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/braket/aws/aws_quantum_task.py:759</span>, in <span class="ansi-cyan-fg">_</span><span class="ansi-blue-fg">(circuit, aws_session, create_task_kwargs, device_arn, device_parameters, disable_qubit_rewiring, inputs, gate_definitions, *args, **kwargs)</span>
-<span class="ansi-green-fg">    750</span>     openqasm_program = OpenQASMProgram(
-<span class="ansi-green-fg">    751</span>         source=openqasm_program.source,
-<span class="ansi-green-fg">    752</span>         inputs=inputs_copy,
-<span class="ansi-green-fg">    753</span>     )
-<span class="ansi-green-fg">    755</span> create_task_kwargs |= {
-<span class="ansi-green-fg">    756</span>     <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">action</span><span class="ansi-yellow-fg">"</span>: openqasm_program.json(),
-<span class="ansi-green-fg">    757</span>     <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">deviceParameters</span><span class="ansi-yellow-fg">"</span>: final_device_parameters.json(exclude_none=<span class="ansi-bold" style="color: rgb(0,135,0)">True</span>),
-<span class="ansi-green-fg">    758</span> }
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">759</span> task_arn = <span class="ansi-yellow-bg">aws_session</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">create_quantum_task</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">create_task_kwargs</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    760</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> AwsQuantumTask(task_arn, aws_session, *args, **kwargs)
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
 
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/braket/aws/aws_session.py:273</span>, in <span class="ansi-cyan-fg">AwsSession.create_quantum_task</span><span class="ansi-blue-fg">(self, **boto3_kwargs)</span>
-<span class="ansi-green-fg">    271</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> job_token:
-<span class="ansi-green-fg">    272</span>     boto3_kwargs[<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">jobToken</span><span class="ansi-yellow-fg">"</span>] = job_token
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">273</span> response = <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">braket_client</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">create_quantum_task</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">boto3_kwargs</span><span class="ansi-yellow-bg">)</span>
-<span class="ansi-green-fg">    274</span> broadcast_event(
-<span class="ansi-green-fg">    275</span>     _TaskCreationEvent(
-<span class="ansi-green-fg">    276</span>         arn=response[<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">quantumTaskArn</span><span class="ansi-yellow-fg">"</span>],
-<span class="ansi-green-fg">   (...)</span><span class="ansi-green-fg">    280</span>     )
-<span class="ansi-green-fg">    281</span> )
-<span class="ansi-green-fg">    282</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> response[<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">quantumTaskArn</span><span class="ansi-yellow-fg">"</span>]
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/botocore/client.py:602</span>, in <span class="ansi-cyan-fg">ClientCreator._create_api_method.&lt;locals&gt;._api_call</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
-<span class="ansi-green-fg">    598</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">TypeError</span>(
-<span class="ansi-green-fg">    599</span>         <span class="ansi-yellow-fg">f</span><span class="ansi-yellow-fg">"</span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>py_operation_name<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-fg">() only accepts keyword arguments.</span><span class="ansi-yellow-fg">"</span>
-<span class="ansi-green-fg">    600</span>     )
-<span class="ansi-green-fg">    601</span> <span style="color: rgb(95,135,135)"># The "self" in this scope is referring to the BaseClient.</span>
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">602</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_make_api_call</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">operation_name</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/botocore/context.py:123</span>, in <span class="ansi-cyan-fg">with_current_context.&lt;locals&gt;.decorator.&lt;locals&gt;.wrapper</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
-<span class="ansi-green-fg">    121</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> hook:
-<span class="ansi-green-fg">    122</span>     hook()
-<span class="ansi-green-fg">--&gt; </span><span class="ansi-green-fg">123</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">func</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
-
-<span class="ansi-cyan-fg">File </span><span class="ansi-green-fg">~/Repository/SAMPA-USP/Catalysis/.venv/lib/python3.12/site-packages/botocore/client.py:1078</span>, in <span class="ansi-cyan-fg">BaseClient._make_api_call</span><span class="ansi-blue-fg">(self, operation_name, api_params)</span>
-<span class="ansi-green-fg">   1074</span>     error_code = request_context.get(
-<span class="ansi-green-fg">   1075</span>         <span class="ansi-yellow-fg">'</span><span class="ansi-yellow-fg">error_code_override</span><span class="ansi-yellow-fg">'</span>
-<span class="ansi-green-fg">   1076</span>     ) <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> error_info.get(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">Code</span><span class="ansi-yellow-fg">"</span>)
-<span class="ansi-green-fg">   1077</span>     error_class = <span style="color: rgb(0,135,0)">self</span>.exceptions.from_code(error_code)
-<span class="ansi-green-fg">-&gt; </span><span class="ansi-green-fg">1078</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> error_class(parsed_response, operation_name)
-<span class="ansi-green-fg">   1079</span> <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
-<span class="ansi-green-fg">   1080</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> parsed_response
-
-<span class="ansi-red-fg">ValidationException</span>: An error occurred (ValidationException) when calling the CreateQuantumTask operation: [line 31] for result type probability, the shot should be between 1 and 100000 on the requested device</pre>
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>metal</th>
+<th>y_true</th>
+<th>logreg_pred</th>
+<th>logreg_proba_1</th>
+<th>ok</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>Rh1</td>
+<td>1</td>
+<td>1</td>
+<td>0.562</td>
+<td>True</td>
+</tr>
+<tr>
+<th>1</th>
+<td>Ir1</td>
+<td>1</td>
+<td>1</td>
+<td>0.603</td>
+<td>True</td>
+</tr>
+<tr>
+<th>2</th>
+<td>Ni1</td>
+<td>1</td>
+<td>1</td>
+<td>0.555</td>
+<td>True</td>
+</tr>
+<tr>
+<th>3</th>
+<td>Pd1</td>
+<td>1</td>
+<td>1</td>
+<td>0.530</td>
+<td>True</td>
+</tr>
+<tr>
+<th>4</th>
+<td>Pt1</td>
+<td>1</td>
+<td>1</td>
+<td>0.541</td>
+<td>True</td>
+</tr>
+<tr>
+<th>5</th>
+<td>Cu1</td>
+<td>0</td>
+<td>1</td>
+<td>0.583</td>
+<td>False</td>
+</tr>
+<tr>
+<th>6</th>
+<td>Ag1</td>
+<td>0</td>
+<td>1</td>
+<td>0.560</td>
+<td>False</td>
+</tr>
+<tr>
+<th>7</th>
+<td>Au1</td>
+<td>0</td>
+<td>1</td>
+<td>0.635</td>
+<td>False</td>
+</tr>
+<tr>
+<th>8</th>
+<td>Pb1</td>
+<td>0</td>
+<td>0</td>
+<td>0.450</td>
+<td>True</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c9372c61">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
+<img alt="No description has been provided for this image" class="" src="data:image/png;base64,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1t4BLq5uJqyMapKwjh44fOUObt3VwtrSHME+deDvbodZP10zdWmKJaOcMl1QRUVF4bXXXsORI0fQvXt3XSjduHEDO3fuxFdffYVPPvnEVOUpxvn//onYqAm6+18vWwAACOrRDxPfjjFRVVTTOFrXwrSQJnCuXQt5DwtwKeseZv10DqlXc0xdmmKxozLAxIkT4eLiggULFuCLL75AQUEBAMDc3Bzt2rVDfHw8hg4daqryFKNF6/b4PvnZk1aIKmPh3oumLoFkzKTT04cNG4Zhw4YhPz8fmZmZAAAXFxfUqlXLlGUREdV4MmqopPGF31q1aqF+/fqmLoOISDE49EdERJImo5xiUBERKZGZmXySikFFRKRAcuqoeJkPIiKSNHZUREQKxMkUREQkaTLKKQYVEZESsaMiIiJJY1AREZGkySinOOuPiIikjR0VEZECceiPiIgkTUY5xaAiIlIidlRERCRpMsopBhURkRLJqaPirD8iIpI0dlRERAoko4aKQUVEpERyGvpjUBERKZCMcopBRUSkROyoiIhI0mSUU5z1R0RE0saOiohIgTj0R0REkiajnGJQEREpETsqIiKSNAYVERFJmoxyirP+iIhI2thREREpEIf+iIhI0mSUUwwqIiIlYkdFRESSJqOcYlARESmRmYySirP+iIhI0thREREpkIwaKnZURERKpFKpKnwrj6VLl6JVq1awt7eHvb09OnfujK1bt5ZrG+yoiIgUyKyaOioPDw98+OGHeO655yCEQEJCAgYMGIBjx46hRYsWBm2DQUVEpEDVNT29f//+evc/+OADLF26FL///juDioiISleZnNJqtdBqtXrL1Go11Gp1mc8rKCjAhg0bkJeXh86dOxu8Px6jIiKictFoNHBwcNC7aTSaUtc/efIkbG1toVarMWHCBGzatAl+fn4G748dFRGRAqlQ8ZYqOjoakZGResvK6qZ8fX2RmpqKO3fuIDExEWFhYdi7d6/BYcWgIiJSoMpMpjBkmO9JlpaW8PHxAQC0a9cOhw4dwsKFC7F8+XKDns+gIiJSIFOe66+wsLDYMa6yMKiIiBSounIqOjoavXv3RqNGjXD37l2sW7cOe/bswfbt2w3eBoOKiEiBqutcfzdv3sSoUaOQkZEBBwcHtGrVCtu3b0ePHj0M3gaDioiIqszKlSsrvQ0GFRGRAsnpXH8MKiIi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aNeuHdauXVtsO3Xr1q3Q/q2trcv9nNzcXADATz/9hAYNGug9plarK1QHUU3EoKIawcbGBj4+Pgat27ZtW6xfvx6urq6wt7cvcZ369evj4MGDCAwMBAA8evQIR44cQdu2bUtc39/fH4WFhdi7dy9CQ0OLPV7U0RUUFOiW+fn5Qa1W4/Lly6V2Ys2bN0dSUpLest9///3ZL5KoBuFkClKcV155BS4uLhgwYAB+/fVXXLx4EXv27MFbb72Fv//+GwAwefJkfPjhh9i8eTPOnj2LN954o8zvQDVu3BhhYWEYPXo0Nm/erNvm999/DwDw9PSESqXCli1bcOvWLeTm5sLOzg5RUVGYOnUqEhIScP78eRw9ehSff/45EhISAAATJkxAWloapk+fjnPnzmHdunW8bDspDoOKFKd27drYt28fGjVqhMGDB6N58+YYM2YMHjx4oOuwpk2bhn//+98ICwtD586dYWdnh0GDBpW53aVLl2LIkCF444030KxZM4wbNw55eXkAgAYNGiA2NhYzZ85EvXr18OabbwIA3n//fcyaNQsajQbNmzfHCy+8gJ9++gleXl4AgEaNGmHjxo3YvHkzWrdujWXLlmHu3LlV+O4QSY9KlHZ0mIiISALYURERkaQxqIiISNIYVEREJGkMKiIikjQGFRERSRqDioiIJI1BRUREksagIiIiSWNQERGRpDGoiIhI0hhUREQkaf8PdoLmDHWMJl4AAAAASUVORK5CYII="/>
 </div>
 </div>
 </div>
