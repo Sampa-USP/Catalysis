@@ -3,3 +3,16 @@ body.research .research-text ul {
     padding-left: 20px;
     list-style: disc;
 }
+
+.referencias a {
+    color: var(--text);
+    /* azul claro */
+    text-decoration: none;
+    /* tira o sublinhado */
+}
+
+.referencias a:hover {
+    color: var(--text-hover);
+    /* branco ao passar o mouse */
+    text-decoration: underline;
+}

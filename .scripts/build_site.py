@@ -106,6 +106,7 @@ def collect_tree(src: Path, out: Path, execute: bool):
 
         cmd = [
             sys.executable, "-m", "nbconvert", "--to", "html",
+            "--HTMLExporter.embed_images=True", 
             "--output", out_html.name, "--output-dir", str(out_html.parent), str(path)
         ]
         if execute:
@@ -159,6 +160,7 @@ def build_static_site(src: Path, out: Path, template_dir: Path, title: str, exec
 
     # assets
     copy_tree(template_dir / "css", out / "css")
+    copy_tree(template_dir / "assets", out / "assets")
     copy_tree(template_dir / "js", out / "js")
 
     return nb_count
